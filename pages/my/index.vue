@@ -224,20 +224,20 @@
         </view>
 
         <view class="plate-display-popup">
-          <view
-            v-for="(char, idx) in plateChars"
-            :key="idx"
-            class="plate-cell"
-            :class="{
-              'plate-cell-filled': char,
-              'plate-cell-active': idx === currentInputIndex,
-              'plate-cell-province': idx === 0,
-              'plate-separator': idx === 2,
-            }"
-          >
-            <text class="plate-cell-text">{{ char || '' }}</text>
-            <view v-if="!char && idx === currentInputIndex" class="plate-cursor"></view>
-          </view>
+          <template v-for="(char, idx) in plateChars" :key="idx">
+            <view v-if="idx === 2" class="plate-separator-dot"></view>
+            <view
+              class="plate-cell"
+              :class="{
+                'plate-cell-filled': char,
+                'plate-cell-active': idx === currentInputIndex,
+                'plate-cell-province': idx === 0,
+              }"
+            >
+              <text class="plate-cell-text">{{ char || '' }}</text>
+              <view v-if="!char && idx === currentInputIndex" class="plate-cursor"></view>
+            </view>
+          </template>
         </view>
 
         <view class="keyboard-content">
@@ -689,6 +689,15 @@
       border: none;
       border-radius: 2px;
     }
+  }
+
+  .plate-separator-dot {
+    width: 7px;
+    height: 7px;
+    background: #2563eb;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin: 0 2px;
   }
 
   .plate-cell-text {
