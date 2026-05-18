@@ -24,7 +24,7 @@
           </view>
 
           <!-- 车牌展示框 -->
-          <view class="plate-display" @click="focusInput">
+          <view class="plate-display" @click="showPlateKeyboard">
             <template v-for="(char, idx) in plateChars" :key="idx">
               <view v-if="idx === 2" class="plate-separator-dot"></view>
               <view
@@ -41,19 +41,6 @@
             </template>
           </view>
 
-          <!-- 隐藏的真实 input（辅助） -->
-          <input
-            ref="plateInput"
-            v-model="plateValue"
-            class="hidden-input"
-            :focus="inputFocused"
-            type="text"
-            maxlength="8"
-            :adjust-position="false"
-            @input="onPlateInput"
-            @blur="onInputBlur"
-          />
-
           <!-- 历史搜索 -->
           <view v-if="historyPlates.length > 0" class="history-section">
             <view class="history-header">
@@ -61,12 +48,7 @@
               <text class="history-clear" @click="clearHistory">清除</text>
             </view>
             <view class="history-tags">
-              <view
-                v-for="plate in historyPlates"
-                :key="plate"
-                class="history-tag"
-                @click="fillHistory(plate)"
-              >
+              <view v-for="plate in historyPlates" :key="plate" class="history-tag" @click="fillHistory(plate)">
                 <yy-icon name="ri:time-line" size="12" color="#6b7280" />
                 <text class="history-tag-text">{{ plate }}</text>
               </view>
@@ -74,82 +56,8 @@
           </view>
         </view>
 
-        <!-- 虚拟键盘 -->
-        <view class="keyboard-section" v-if="showKeyboard">
-          <!-- 省份行 -->
-          <view v-if="currentInputIndex === 0" class="keyboard-row province-row">
-            <view
-              v-for="p in provinces"
-              :key="p"
-              class="key-btn"
-              :class="{ 'key-btn-primary': true }"
-              @click="typeChar(p)"
-            >
-              <text class="key-text">{{ p }}</text>
-            </view>
-          </view>
-
-          <!-- 字母数字行 -->
-          <template v-if="currentInputIndex > 0">
-            <view class="keyboard-row">
-              <view
-                v-for="k in keyboardRow1"
-                :key="k"
-                class="key-btn"
-                @click="typeChar(k)"
-              >
-                <text class="key-text">{{ k }}</text>
-              </view>
-            </view>
-            <view class="keyboard-row">
-              <view
-                v-for="k in keyboardRow2"
-                :key="k"
-                class="key-btn"
-                @click="typeChar(k)"
-              >
-                <text class="key-text">{{ k }}</text>
-              </view>
-            </view>
-            <view class="keyboard-row">
-              <view
-                v-for="k in keyboardRow3"
-                :key="k"
-                class="key-btn"
-                :class="{ 'key-btn-disabled': k === 'I' || k === 'O' }"
-                @click="typeChar(k)"
-              >
-                <text class="key-text">{{ k }}</text>
-              </view>
-              <view class="key-btn key-btn-delete" @click="deleteChar">
-                <yy-icon name="ri:delete-back-2-line" size="18" color="#374151" />
-              </view>
-            </view>
-            <view class="keyboard-row">
-              <view
-                v-for="k in keyboardNums"
-                :key="k"
-                class="key-btn key-btn-num"
-                @click="typeChar(k)"
-              >
-                <text class="key-text">{{ k }}</text>
-              </view>
-            </view>
-          </template>
-
-          <!-- 键盘底部操作 -->
-          <view class="keyboard-footer">
-            <view class="key-clear-btn" @click="clearPlate">
-              <text class="key-clear-text">清空</text>
-            </view>
-            <view class="key-confirm-btn" @click="hideKeyboard">
-              <text class="key-confirm-text">完成</text>
-            </view>
-          </view>
-        </view>
-
         <!-- 联系方式选择（填写车牌后显示） -->
-        <view v-if="!showKeyboard && plateValue.length >= 7" class="contact-actions">
+        <view v-if="plateValue.length >= 7" class="contact-actions">
           <view class="contact-tip">
             <yy-icon name="ri:information-line" size="14" color="#6b7280" />
             <text class="contact-tip-text">将向该车辆车主发起挪车请求</text>
@@ -167,7 +75,7 @@
         </view>
 
         <!-- 扫码入口 -->
-        <view v-if="!showKeyboard" class="scan-entry" @click="scanQRCode">
+        <view class="scan-entry" @click="scanQRCode">
           <view class="scan-icon-wrap">
             <yy-icon name="ri:qr-scan-2-line" size="24" color="#2563eb" />
           </view>
@@ -180,23 +88,23 @@
       </view>
 
       <!-- 功能入口卡片 -->
-      <view class="feature-row" v-if="!showKeyboard">
+      <view class="feature-row">
         <view class="feature-card" @click="toMy">
-          <view class="feature-icon" style="background: #eff6ff;">
+          <view class="feature-icon" style="background: #eff6ff">
             <yy-icon name="ri:car-line" size="28" color="#2563eb" />
           </view>
           <text class="feature-label">我的车辆</text>
           <text class="feature-desc">设置车牌信息</text>
         </view>
         <view class="feature-card" @click="toQrcode">
-          <view class="feature-icon" style="background: #f0fdf4;">
+          <view class="feature-icon" style="background: #f0fdf4">
             <yy-icon name="ri:qr-code-line" size="28" color="#16a34a" />
           </view>
           <text class="feature-label">挪车码</text>
           <text class="feature-desc">生成专属二维码</text>
         </view>
         <view class="feature-card" @click="toHistory">
-          <view class="feature-icon" style="background: #fff7ed;">
+          <view class="feature-icon" style="background: #fff7ed">
             <yy-icon name="ri:history-line" size="28" color="#ea580c" />
           </view>
           <text class="feature-label">挪车记录</text>
@@ -205,7 +113,7 @@
       </view>
 
       <!-- 使用说明 -->
-      <view class="tips-card" v-if="!showKeyboard">
+      <view class="tips-card">
         <view class="tips-header">
           <yy-icon name="ri:lightbulb-line" size="16" color="#d97706" />
           <text class="tips-title">使用提示</text>
@@ -226,9 +134,12 @@
         </view>
       </view>
 
-      <view style="height: 40rpx;"></view>
+      <view style="height: 40rpx"></view>
     </view>
   </yy-paging>
+
+  <!-- 车牌输入键盘弹框 -->
+  <yy-plate-keyboard v-model:visible="keyboardVisible" v-model="plateValue" />
 </template>
 
 <script setup>
@@ -253,20 +164,11 @@
   const paging = ref()
 
   // ====== 业务状态 ======
-  const showKeyboard = ref(false)
-  const inputFocused = ref(false)
+  const keyboardVisible = ref(false)
   const plateValue = ref('')
-  const plateInput = ref(null)
 
   // 从存储加载历史记录
   const historyPlates = ref([])
-
-  // 省份简称
-  const provinces = ['京', '津', '沪', '渝', '冀', '豫', '云', '辽', '黑', '湘', '皖', '鲁', '新', '苏', '浙', '赣', '鄂', '桂', '甘', '晋', '蒙', '陕', '吉', '闽', '贵', '粤', '川', '青', '琼', '宁', '藏']
-  const keyboardRow1 = ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'P']
-  const keyboardRow2 = ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L']
-  const keyboardRow3 = ['Z', 'X', 'C', 'V', 'B', 'N', 'M']
-  const keyboardNums = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
 
   // 当前输入光标位置
   const currentInputIndex = computed(() => {
@@ -302,46 +204,12 @@
     historyPlates.value = history.slice(0, 6)
   }
 
-  function focusInput() {
-    showKeyboard.value = true
-  }
-
-  function hideKeyboard() {
-    showKeyboard.value = false
-  }
-
-  function onInputBlur() {
-    // 保持键盘状态由自定义键盘控制
-  }
-
-  function onPlateInput(e) {
-    plateValue.value = e.detail.value.toUpperCase().replace(/[^A-Z0-9\u4e00-\u9fa5]/g, '').slice(0, 8)
-  }
-
-  function typeChar(char) {
-    if (plateValue.value.length < 8) {
-      // I 和 O 不允许（第2位以后）
-      if (currentInputIndex.value > 0 && (char === 'I' || char === 'O')) return
-      plateValue.value += char
-    }
-    if (plateValue.value.length === 8) {
-      hideKeyboard()
-    }
-  }
-
-  function deleteChar() {
-    if (plateValue.value.length > 0) {
-      plateValue.value = plateValue.value.slice(0, -1)
-    }
-  }
-
-  function clearPlate() {
-    plateValue.value = ''
+  function showPlateKeyboard() {
+    keyboardVisible.value = true
   }
 
   function fillHistory(plate) {
     plateValue.value = plate
-    showKeyboard.value = false
   }
 
   function clearHistory() {
@@ -566,8 +434,14 @@
   }
 
   @keyframes blink {
-    0%, 50% { opacity: 1; }
-    51%, 100% { opacity: 0; }
+    0%,
+    50% {
+      opacity: 1;
+    }
+    51%,
+    100% {
+      opacity: 0;
+    }
   }
 
   .hidden-input {
@@ -615,7 +489,9 @@
     padding: 4px 10px;
     background: #f3f4f6;
     border-radius: 20px;
-    &:active { opacity: 0.7; }
+    &:active {
+      opacity: 0.7;
+    }
   }
 
   .history-tag-text {
@@ -693,7 +569,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    &:active { opacity: 0.7; }
+    &:active {
+      opacity: 0.7;
+    }
   }
 
   .key-clear-text {
@@ -709,7 +587,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    &:active { opacity: 0.85; }
+    &:active {
+      opacity: 0.85;
+    }
   }
 
   .key-confirm-text {
@@ -755,7 +635,10 @@
     justify-content: center;
     gap: 8px;
     box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
-    &:active { opacity: 0.9; transform: scale(0.98); }
+    &:active {
+      opacity: 0.9;
+      transform: scale(0.98);
+    }
   }
 
   .btn-text {
@@ -774,7 +657,9 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    &:active { opacity: 0.8; }
+    &:active {
+      opacity: 0.8;
+    }
   }
 
   .btn-msg-text {
@@ -793,7 +678,9 @@
     background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
     border-radius: 16px;
     border: 1px solid #bae6fd;
-    &:active { opacity: 0.8; }
+    &:active {
+      opacity: 0.8;
+    }
   }
 
   .scan-icon-wrap {
@@ -839,7 +726,10 @@
     align-items: center;
     gap: 8px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
-    &:active { opacity: 0.8; transform: scale(0.97); }
+    &:active {
+      opacity: 0.8;
+      transform: scale(0.97);
+    }
   }
 
   .feature-icon {

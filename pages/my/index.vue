@@ -1,20 +1,6 @@
 <template>
-  <view class="page-container">
-    <!-- 顶部背景 -->
-    <view class="header-bg"></view>
-
-    <!-- 自定义导航栏 -->
-    <view class="nav-bar" :style="{ paddingTop: safeAreaTop + 'px' }">
-      <view class="nav-content">
-        <view class="nav-back" @click="goBack">
-          <yy-icon name="ri:arrow-left-s-line" size="24" color="#ffffff" />
-        </view>
-        <text class="nav-title-text">我的</text>
-        <view class="nav-back" style="opacity: 0"></view>
-      </view>
-    </view>
-
-    <scroll-view scroll-y class="page-scroll" :style="{ paddingTop: safeAreaTop + 56 + 'px' }">
+  <yy-paging v-model="state.dataList" @query="queryList" ref="paging" @scroll="scroll" v-bind="pagingConfig">
+    <view class="page-content">
       <!-- 用户头像区 -->
       <view class="profile-section">
         <view class="avatar-wrap">
@@ -200,16 +186,36 @@
         </view>
       </view>
 
-      <view style="height: 40px"></view>
-    </scroll-view>
+      <view style="height: 40rpx"></view>
+    </view>
 
     <!-- 车牌输入键盘组件 -->
     <yy-plate-keyboard v-model:visible="keyboardVisible" v-model="form.plate" />
-  </view>
+  </yy-paging>
 </template>
 
 <script setup>
-  const safeAreaTop = ref(0)
+  // ====== yy-paging 配置 ======
+  const pagingConfig = ref({
+    auto: false,
+    refresherEnabled: false,
+    showRefresherWhenReload: false,
+    loadingMoreEnabled: false,
+    showTabbar: false,
+    hideNav: false,
+    showNavBack: true,
+    navTitle: '我的',
+    color: uni.$u.color.primary,
+  })
+
+  const state = ref({
+    isScroll: false,
+    dataList: [],
+  })
+
+  const paging = ref()
+
+  // ====== 业务状态 ======
   const keyboardVisible = ref(false)
 
   const form = ref({
@@ -238,14 +244,21 @@
   })
 
   onLoad(() => {
-    const sysInfo = uni.getSystemInfoSync()
-    safeAreaTop.value = sysInfo.statusBarHeight || 0
     loadInfo()
   })
 
   onShow(() => {
     loadInfo()
   })
+
+  function scroll(e) {
+    state.value.isScroll = e.detail.scrollTop > 0
+  }
+
+  async function queryList(page, limit) {
+    await new Promise(resolve => setTimeout(resolve, 50))
+    paging.value?.complete([])
+  }
 
   function loadInfo() {
     const saved = uni.getStorageSync('my_car_info')
@@ -304,82 +317,22 @@
       confirmColor: '#2563eb',
     })
   }
-
-  function goBack() {
-    const pages = getCurrentPages()
-    if (pages.length > 1) {
-      uni.navigateBack()
-    } else {
-      uni.switchTab && uni.switchTab({ url: '/pages/index/index' })
-      uni.reLaunch({ url: '/pages/index/index' })
-    }
-  }
 </script>
 
 <style lang="scss" scoped>
-  .page-container {
+  .page-content {
     min-height: 100vh;
     background: #f5f7fb;
-    position: relative;
-  }
-
-  .header-bg {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 220rpx;
-    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 60%, #3b82f6 100%);
-    z-index: 0;
-  }
-
-  .nav-bar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 100;
-  }
-
-  .nav-content {
-    height: 56px;
-    padding: 0 12px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .nav-back {
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    &:active {
-      background: rgba(255, 255, 255, 0.15);
-    }
-  }
-
-  .nav-title-text {
-    font-size: 17px;
-    font-weight: 600;
-    color: #ffffff;
-  }
-
-  .page-scroll {
-    height: 100vh;
-    box-sizing: border-box;
+    padding-bottom: 24rpx;
   }
 
   /* 用户头像区 */
   .profile-section {
-    position: relative;
-    z-index: 10;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 12px 0 24px;
+    padding: 20px 0 24px;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 60%, #3b82f6 100%);
   }
 
   .avatar-wrap {
@@ -416,7 +369,7 @@
 
   /* 信息卡片 */
   .info-card {
-    margin: 0 16px;
+    margin: 16px 16px 0;
     background: #ffffff;
     border-radius: 20px;
     padding: 18px;
@@ -557,11 +510,6 @@
     background: #ffffff;
     position: relative;
 
-    &.plate-cell-active {
-      border-color: #2563eb;
-      background: #eff6ff;
-    }
-
     &.plate-cell-filled {
       border-color: #2563eb;
     }
@@ -574,14 +522,6 @@
         color: #ffffff;
         font-weight: 700;
       }
-    }
-
-    &.plate-separator {
-      width: 6px;
-      height: 4px;
-      background: #d1d5db;
-      border: none;
-      border-radius: 2px;
     }
   }
 
@@ -598,26 +538,6 @@
     font-size: 18px;
     font-weight: 700;
     color: #1f2937;
-  }
-
-  .plate-cursor {
-    position: absolute;
-    width: 2px;
-    height: 22px;
-    background: #2563eb;
-    border-radius: 1px;
-    animation: blink 1s infinite;
-  }
-
-  @keyframes blink {
-    0%,
-    50% {
-      opacity: 1;
-    }
-    51%,
-    100% {
-      opacity: 0;
-    }
   }
 
   /* 保存按钮 */
