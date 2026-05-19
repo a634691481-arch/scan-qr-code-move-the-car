@@ -73,6 +73,27 @@
 				"disableScroll": true,
 				"enablePullDownRefresh": false
 			}
+		},
+		{
+			"path": "pages/my/feedback",
+			"style": {
+				"disableScroll": true,
+				"enablePullDownRefresh": false
+			}
+		},
+		{
+			"path": "pages/my/car-manage",
+			"style": {
+				"disableScroll": true,
+				"enablePullDownRefresh": false
+			}
+		},
+		{
+			"path": "pages/my/statistics",
+			"style": {
+				"disableScroll": true,
+				"enablePullDownRefresh": false
+			}
 		}
 	],
 	"globalStyle": {

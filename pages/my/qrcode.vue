@@ -431,7 +431,6 @@
 
 <style lang="scss" scoped>
   .page-content {
-    min-height: 100vh;
     background: #f5f7fb;
     padding: 12px 0 24rpx;
   }

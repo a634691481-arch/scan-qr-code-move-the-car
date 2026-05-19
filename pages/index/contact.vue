@@ -299,7 +299,7 @@
       }
     } catch (err) {
       vk.hideLoading()
-      vk.toast('发送失败，请稍后重试')
+      vk.toast('发送失败，超出次数限制')
     }
   }
 
@@ -332,7 +332,6 @@
 
 <style lang="scss" scoped>
   .page-content {
-    min-height: 100vh;
     background: #f5f7fb;
     padding-bottom: 24rpx;
   }

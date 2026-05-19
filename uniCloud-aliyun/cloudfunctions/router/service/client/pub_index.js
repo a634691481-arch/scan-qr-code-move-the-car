@@ -3,6 +3,7 @@ let vk = uniCloud.vk;
 
 const DB_NAME = 'car-info';
 const CONTACT_HISTORY_DB = 'contact-history';
+const FEEDBACK_DB = 'feedback';
 
 const cloudObject = {
 	isCloudObject: true,
@@ -659,6 +660,128 @@ const cloudObject = {
 			pushToken: carInfo.pushToken || '',
 		};
 
+		return res;
+	},
+
+	addFeedback: async function(data) {
+		let res = { code: 0, msg: '' };
+		let { uid, type, content, contact } = data;
+
+		if (!type) {
+			return { code: -1, msg: '请选择反馈类型' };
+		}
+		if (!content || content.trim().length < 5) {
+			return { code: -1, msg: '反馈内容至少5个字' };
+		}
+
+		await vk.baseDao.add({
+			dbName: FEEDBACK_DB,
+			dataJson: {
+				uid: uid || '',
+				type,
+				content: content.trim(),
+				contact: contact || '',
+				status: 'pending',
+			},
+		});
+
+		res.msg = '提交成功';
+		return res;
+	},
+
+	// 获取用户使用统计
+	getUserStatistics: async function(data) {
+		let res = { code: 0, msg: '' };
+		let { uid } = data;
+
+		if (!uid) {
+			return { code: -1, msg: '用户未登录' };
+		}
+
+		// 1. 车辆数量
+		let carRes = await vk.baseDao.select({
+			dbName: DB_NAME,
+			whereJson: { uid },
+			pageSize: -1,
+		});
+		let carList = carRes.rows || [];
+		let carCount = carList.length;
+
+		// 2. 我联系他人的次数（作为联系人）
+		let contactRes = await vk.baseDao.select({
+			dbName: CONTACT_HISTORY_DB,
+			whereJson: { uid },
+			pageSize: -1,
+		});
+		let myContacts = contactRes.rows || [];
+		let contactCount = myContacts.length;
+
+		// 3. 他人联系我的次数（通过车牌号匹配）
+		let myPlates = carList.map(c => c.plate).filter(Boolean);
+		let beContactedCount = 0;
+		if (myPlates.length > 0) {
+			let beContactedRes = await vk.baseDao.select({
+				dbName: CONTACT_HISTORY_DB,
+				whereJson: {
+					plate: { $in: myPlates },
+					uid: { $ne: uid },
+				},
+				pageSize: -1,
+			});
+			beContactedCount = (beContactedRes.rows || []).length;
+		}
+
+		// 4. 本月联系次数
+		let now = new Date();
+		let monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+		let monthContacts = myContacts.filter(r => r._add_time && new Date(r._add_time) >= monthStart);
+		let monthContactCount = monthContacts.length;
+
+		// 5. 本周联系次数
+		let dayOfWeek = now.getDay() || 7;
+		let weekStart = new Date(now);
+		weekStart.setDate(now.getDate() - dayOfWeek + 1);
+		weekStart.setHours(0, 0, 0, 0);
+		let weekContacts = myContacts.filter(r => r._add_time && new Date(r._add_time) >= weekStart);
+		let weekContactCount = weekContacts.length;
+
+		// 6. 最近7天每日联系趋势
+		let dailyTrend = [];
+		for (let i = 6; i >= 0; i--) {
+			let d = new Date(now);
+			d.setDate(d.getDate() - i);
+			d.setHours(0, 0, 0, 0);
+			let nextD = new Date(d);
+			nextD.setDate(nextD.getDate() + 1);
+			let count = myContacts.filter(r => {
+				if (!r._add_time) return false;
+				let t = new Date(r._add_time);
+				return t >= d && t < nextD;
+			}).length;
+			let label = `${d.getMonth() + 1}/${d.getDate()}`;
+			dailyTrend.push({ label, count });
+		}
+
+		// 7. 最常联系的车牌 TOP5
+		let plateCountMap = {};
+		myContacts.forEach(r => {
+			let p = r.plate || '未知';
+			plateCountMap[p] = (plateCountMap[p] || 0) + 1;
+		});
+		let topPlates = Object.entries(plateCountMap)
+			.sort((a, b) => b[1] - a[1])
+			.slice(0, 5)
+			.map(([plate, count]) => ({ plate, count }));
+
+		res.data = {
+			carCount,
+			contactCount,
+			beContactedCount,
+			monthContactCount,
+			weekContactCount,
+			dailyTrend,
+			topPlates,
+		};
 		return res;
 	},
 };

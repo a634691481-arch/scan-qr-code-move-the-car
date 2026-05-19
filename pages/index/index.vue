@@ -85,12 +85,12 @@
 
       <!-- 功能入口卡片 -->
       <view class="feature-row">
-        <view class="feature-card" @click="toMy">
+        <view class="feature-card" @click="toCarManage">
           <view class="feature-icon" :style="{ background: uni.$u.color.primaryLight }">
             <yy-icon name="ri:car-line" size="28" :color="uni.$u.color.primary" />
           </view>
           <text class="feature-label">我的车辆</text>
-          <text class="feature-desc">设置车牌信息</text>
+          <text class="feature-desc">管理车牌信息</text>
         </view>
         <view class="feature-card" @click="toQrcode">
           <view class="feature-icon" style="background: #f0fdf4">
@@ -449,7 +449,7 @@
     }
   }
 
-  function toMy() {
+  function toCarManage() {
     vk.navigateTo('/pages/my/index')
   }
 
@@ -492,7 +492,6 @@
 
 <style lang="scss" scoped>
   .page-content {
-    min-height: 100vh;
     background: #f5f7fb;
     padding-bottom: 24rpx;
   }
