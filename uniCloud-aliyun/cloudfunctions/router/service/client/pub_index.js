@@ -1,10 +1,7 @@
 'use strict';
 let vk = uniCloud.vk;
-const dbName = require('../../dao/config.js');
 
-const db = uniCloud.database();
-const _ = db.command;
-const $ = _.aggregate;
+const DB_NAME = 'car-info';
 
 const cloudObject = {
 	isCloudObject: true,
@@ -33,7 +30,10 @@ const cloudObject = {
 			return { code: -1, msg: '请输入正确的车牌号' };
 		}
 
-		let carInfo = await vk.daoCenter.carDao.findByPlate(plate);
+		let carInfo = await vk.baseDao.findByWhereJson({
+			dbName: DB_NAME,
+			whereJson: { plate: plate.toUpperCase() }
+		});
 
 		if (!carInfo) {
 			return { code: -1, msg: '未找到该车辆信息' };
@@ -61,7 +61,10 @@ const cloudObject = {
 			return { code: -1, msg: '扫码数据不完整' };
 		}
 
-		let carInfo = await vk.daoCenter.carDao.findByPlate(plate.toUpperCase());
+		let carInfo = await vk.baseDao.findByWhereJson({
+			dbName: DB_NAME,
+			whereJson: { plate: plate.toUpperCase() }
+		});
 
 		if (!carInfo || carInfo.phone !== phone) {
 			return { code: -1, msg: '未找到该车辆信息' };
@@ -89,7 +92,10 @@ const cloudObject = {
 			return { code: -1, msg: '车牌号不能为空' };
 		}
 
-		let carInfo = await vk.daoCenter.carDao.findByPlate(plate);
+		let carInfo = await vk.baseDao.findByWhereJson({
+			dbName: DB_NAME,
+			whereJson: { plate: plate.toUpperCase() }
+		});
 
 		if (!carInfo) {
 			res.data = null;
@@ -126,7 +132,10 @@ const cloudObject = {
 
 		plate = plate.toUpperCase();
 
-		let plateOwner = await vk.daoCenter.carDao.findByPlate(plate);
+		let plateOwner = await vk.baseDao.findByWhereJson({
+			dbName: DB_NAME,
+			whereJson: { plate }
+		});
 
 		let dataJson = {
 			plate,
@@ -141,13 +150,17 @@ const cloudObject = {
 		};
 
 		if (plateOwner) {
-			await vk.daoCenter.carDao.updateById({
+			await vk.baseDao.updateById({
+				dbName: DB_NAME,
 				id: plateOwner._id,
 				dataJson,
 			});
 			res.msg = '更新成功';
 		} else {
-			let id = await vk.daoCenter.carDao.add(dataJson);
+			let id = await vk.baseDao.add({
+				dbName: DB_NAME,
+				dataJson
+			});
 			res.msg = '保存成功';
 			res.id = id;
 		}
@@ -163,10 +176,16 @@ const cloudObject = {
 			return { code: -1, msg: '车牌号不能为空' };
 		}
 
-		let plateOwner = await vk.daoCenter.carDao.findByPlate(plate.toUpperCase());
+		let plateOwner = await vk.baseDao.findByWhereJson({
+			dbName: DB_NAME,
+			whereJson: { plate: plate.toUpperCase() }
+		});
 
 		if (plateOwner) {
-			await vk.daoCenter.carDao.deleteById(plateOwner._id);
+			await vk.baseDao.deleteById({
+				dbName: DB_NAME,
+				id: plateOwner._id
+			});
 			res.msg = '删除成功';
 		} else {
 			res.msg = '车辆信息不存在';
@@ -186,7 +205,10 @@ const cloudObject = {
 			return { code: -1, msg: '推送token不能为空' };
 		}
 
-		let carInfo = await vk.daoCenter.carDao.findByPlate(plate.toUpperCase());
+		let carInfo = await vk.baseDao.findByWhereJson({
+			dbName: DB_NAME,
+			whereJson: { plate: plate.toUpperCase() }
+		});
 		if (!carInfo) {
 			return { code: -1, msg: '未找到该车辆信息' };
 		}
@@ -220,5 +242,4 @@ const cloudObject = {
 	},
 };
 
-module.exports = cloudObject;
 module.exports = cloudObject;

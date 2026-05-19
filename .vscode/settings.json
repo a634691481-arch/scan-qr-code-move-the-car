@@ -59,7 +59,7 @@
     
 
     // 【如需修改云函数则取消下面这行】
-    "**/uniCloud-aliyun": true
+    "**/uniCloud-aliyun": false
   },
 
   // 单层空文件夹自动压缩（pages/error/404 显示成一行）
