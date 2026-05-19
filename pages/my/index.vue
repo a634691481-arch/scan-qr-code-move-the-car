@@ -28,6 +28,17 @@
 
       <!-- 功能列表 -->
       <view class="menu-card">
+        <view class="menu-item" @click="toGuide">
+          <view class="menu-icon" style="background: #ecfdf5">
+            <yy-icon name="ri:book-open-line" size="20" color="#10b981" />
+          </view>
+          <view class="menu-content">
+            <text class="menu-label">使用教程</text>
+            <text class="menu-desc">新手指南和常见问题</text>
+          </view>
+          <yy-icon name="ri:arrow-right-s-line" size="20" color="#9ca3af" />
+        </view>
+
         <view class="menu-item" @click="toStatistics">
           <view class="menu-icon" style="background: #fef3c7">
             <yy-icon name="ri:bar-chart-box-line" size="20" color="#d97706" />
@@ -226,6 +237,10 @@
 
   function toCarManage() {
     vk.navigateTo('/pages/my/car-manage')
+  }
+
+  function toGuide() {
+    vk.navigateTo('/pages/my/guide')
   }
 
   function toStatistics() {

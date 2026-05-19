@@ -136,6 +136,9 @@
 
   <!-- 车牌输入键盘弹框 -->
   <yy-plate-keyboard v-model:visible="keyboardVisible" v-model="plateValue" />
+
+  <!-- 首次使用引导弹窗 -->
+  <yy-first-guide v-model="showGuidePopup" @skip="skipGuide" @goGuide="goToGuide" />
 </template>
 
 <script setup>
@@ -162,6 +165,7 @@
   // ====== 业务状态 ======
   const keyboardVisible = ref(false)
   const plateValue = ref('')
+  const showGuidePopup = ref(false)
 
   // 从存储加载历史记录
   const historyPlates = ref([])
@@ -182,11 +186,31 @@
     loadHistory()
     // 处理小程序码扫码进入（scene 参数）
     handleSceneLaunch(options)
+    // 检查是否首次使用
+    checkFirstTimeGuide()
   })
 
   onShow(() => {
     loadHistory()
   })
+
+  function checkFirstTimeGuide() {
+    const hasSeenGuide = vk.getStorageSync('has_seen_guide')
+    if (!hasSeenGuide) {
+      showGuidePopup.value = true
+    }
+  }
+
+  function skipGuide() {
+    showGuidePopup.value = false
+    vk.setStorageSync('has_seen_guide', true)
+  }
+
+  function goToGuide() {
+    showGuidePopup.value = false
+    vk.setStorageSync('has_seen_guide', true)
+    vk.navigateTo('/pages/my/guide')
+  }
 
   function scroll(e) {
     state.value.isScroll = e.detail.scrollTop > 0
@@ -488,6 +512,7 @@
   const scanIconWrapStyle = computed(() => ({
     boxShadow: `0 2px 8px ${uni.$u.color.primary}1f`,
   }))
+
 </script>
 
 <style lang="scss" scoped>
@@ -913,4 +938,5 @@
     line-height: 1.5;
     flex: 1;
   }
+
 </style>

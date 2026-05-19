@@ -932,7 +932,8 @@
 
   /* 挪车码入口卡片 */
   .qrcode-card {
-    margin: 12px 16px 0;
+    // margin: 12px 16px 0;
+    margin-top: 12px;
     background: #ffffff;
     border-radius: 20px;
     padding: 18px;
@@ -941,6 +942,7 @@
     justify-content: space-between;
     gap: 12px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    width: 100%;
 
     &:active {
       background: #f9fafb;
