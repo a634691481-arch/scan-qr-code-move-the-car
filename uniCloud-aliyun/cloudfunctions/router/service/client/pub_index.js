@@ -306,6 +306,52 @@ const cloudObject = {
 		};
 		return res;
 	},
+
+	deleteContactHistory: async function(data) {
+		let res = { code: 0, msg: '' };
+		let { uid, id } = data;
+
+		if (!uid) {
+			return { code: -1, msg: '用户未登录' };
+		}
+		if (!id) {
+			return { code: -1, msg: '记录ID不能为空' };
+		}
+
+		let record = await vk.baseDao.findById({
+			dbName: CONTACT_HISTORY_DB,
+			id,
+		});
+
+		if (!record || record.uid !== uid) {
+			return { code: -1, msg: '记录不存在或无权限' };
+		}
+
+		await vk.baseDao.deleteById({
+			dbName: CONTACT_HISTORY_DB,
+			id,
+		});
+
+		res.msg = '删除成功';
+		return res;
+	},
+
+	clearContactHistory: async function(data) {
+		let res = { code: 0, msg: '' };
+		let { uid } = data;
+
+		if (!uid) {
+			return { code: -1, msg: '用户未登录' };
+		}
+
+		await vk.baseDao.del({
+			dbName: CONTACT_HISTORY_DB,
+			whereJson: { uid },
+		});
+
+		res.msg = '清空成功';
+		return res;
+	},
 };
 
 module.exports = cloudObject;

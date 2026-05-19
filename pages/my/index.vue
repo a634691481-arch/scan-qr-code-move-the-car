@@ -285,7 +285,7 @@ console.log("🚀 ~ :252 ~ saveInfo ~ err:", err);
   // ====== 业务状态 ======
   const keyboardVisible = ref(false)
   const themePickerVisible = ref(false)
-  const tokenExpanded = ref(false)
+  const tokenExpanded = ref(true)
 
   const defaultNote = '您好，我的车临时停在此处，如有妨碍请随时联系我，谢谢！'
 

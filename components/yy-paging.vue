@@ -95,7 +95,7 @@
       <slot name="right" />
     </template>
     <template #loading>
-      <yy-loading></yy-loading>
+      <!-- <yy-loading></yy-loading> -->
     </template>
 
     <template #empty>
