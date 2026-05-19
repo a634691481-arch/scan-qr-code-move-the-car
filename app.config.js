@@ -37,13 +37,7 @@ export default {
      * 在无需登录的页面上执行kh或sys函数，也会自动判断是否登录，未登录会自动跳登录页面，登录成功后会自动返回本来要跳转的页面。
      */
     mode: 2,
-    list: [
-      '/pages/tourGuide/index',
-      '/pages/index/index',
-      '/pages/consult/index',
-      '/pages/login/index',
-      '/pages/my/index',
-    ],
+    list: ['/pages/index/*', '/pages/login/index'],
   },
   checkSharePages: {
     /**
