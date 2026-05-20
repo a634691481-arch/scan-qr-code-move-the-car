@@ -383,12 +383,12 @@
       ctx.setFillStyle('#fff')
       ctx.setFontSize(54)
       ctx.setTextAlign('center')
-      ctx.fillText('微信扫码', rightCenterX, contentCenterY - 100)
+      ctx.fillText('\uD83D\uDCF1 微信扫码', rightCenterX, contentCenterY - 100)
 
       // 副标题
       ctx.setFillStyle('#fff')
       ctx.setFontSize(54)
-      ctx.fillText('呼叫车主', rightCenterX, contentCenterY - 32)
+      ctx.fillText('\uD83D\uDE97 呼叫车主', rightCenterX, contentCenterY - 32)
 
       // 分隔线
       ctx.setStrokeStyle('rgba(0,0,0,0.1)')
@@ -400,7 +400,7 @@
 
       // 标签
       const tagY = contentCenterY + 48
-      const tagText = '隐私通话 · 快速联系'
+      const tagText = '\uD83D\uDCDE隐私通话 · 快速联系'
       const tagW = 300
       const tagH = 50
       const tagX = rightCenterX - tagW / 2
