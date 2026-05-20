@@ -381,13 +381,13 @@
 
       // 主标题
       ctx.setFillStyle('#fff')
-      ctx.setFontSize(54)
+      ctx.font = 'bold 54px sans-serif'
       ctx.setTextAlign('center')
       ctx.fillText('\uD83D\uDCF1 微信扫码', rightCenterX, contentCenterY - 100)
 
       // 副标题
       ctx.setFillStyle('#fff')
-      ctx.setFontSize(54)
+      ctx.font = 'bold 54px sans-serif'
       ctx.fillText('\uD83D\uDE97 呼叫车主', rightCenterX, contentCenterY - 32)
 
       // 分隔线
@@ -413,7 +413,7 @@
       }
       ctx.fill()
       ctx.setFillStyle('#ffffff')
-      ctx.setFontSize(20)
+      ctx.font = 'bold 20px sans-serif'
       ctx.fillText(tagText, rightCenterX, tagY + 34)
 
       ctx.draw(false, () => {
