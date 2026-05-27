@@ -8,14 +8,6 @@
 	},
 	"pages": [
 		{
-			"path": "pages/index/middle",
-			"style": {
-				"disableScroll": false,
-				"enablePullDownRefresh": false,
-				"navigationBarTitleText": "挪车助手"
-			}
-		},
-		{
 			"path": "pages/index/index",
 			"style": {
 				"disableScroll": false,
