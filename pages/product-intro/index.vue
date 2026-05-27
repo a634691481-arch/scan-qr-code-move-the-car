@@ -157,11 +157,32 @@
     </view>
 
     <!-- 底部占位 -->
-    <view style="height: 60rpx"></view>
+    <view style="height: 120rpx"></view>
   </view>
+
+  <!-- 底部进入首页按钮 -->
+  <!-- <yy-fixed-bottom
+    text="进入挪车助手"
+    icon="ri:arrow-right-line"
+    :btn-style="{ background: `linear-gradient(135deg, ${uni.$u.color.primary}, ${uni.$u.color.primaryDark})` }"
+    @click="goHome"
+  /> -->
 </template>
 
 <script setup>
+  function goHome() {
+    // 获取启动参数（从中介页面传递过来的原始启动参数）
+    const launchOptions = uni.getLaunchOptionsSync()
+    const query = launchOptions?.query || {}
+    let url = '/pages/index/index'
+    if (Object.keys(query).length > 0) {
+      const qs = Object.keys(query)
+        .map(k => k + '=' + encodeURIComponent(query[k]))
+        .join('&')
+      url += '?' + qs
+    }
+    vk.reLaunch({ url })
+  }
   // ====== 核心功能数据 ======
   const features = [
     {
@@ -315,7 +336,7 @@
       color: '#059669',
     },
     {
-      icon: 'ri:user-privacy-line',
+      icon: 'ri:phone-lock-line',
       title: '隐私号码',
       desc: '支持隐藏真实号码，虚拟号沟通',
       color: '#7c3aed',
